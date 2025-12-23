@@ -1,7 +1,7 @@
 import * as ort from 'onnxruntime-web';
 
-// Configure ONNX Runtime for WebAssembly
-ort.env.wasm.wasmPaths = 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.17.1/dist/';
+// Configure ONNX Runtime for WebAssembly - use version matching installed package
+ort.env.wasm.wasmPaths = 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.21.0/dist/';
 
 export const CLASS_NAMES = [
   'OxygenTank',
