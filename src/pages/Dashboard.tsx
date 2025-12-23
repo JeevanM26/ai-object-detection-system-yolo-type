@@ -71,7 +71,7 @@ export default function Dashboard() {
     if (!isModelLoaded() || !imageSource) return;
     const now = performance.now();
     try {
-      const result = await runInference(imageSource);
+      const result = await runInference(imageSource, 0.6);
       setDetections(result.detections);
       setAllDetections(prev => [...result.detections, ...prev].slice(0, 100));
       const fps = 1000 / (now - lastTimeRef.current);
