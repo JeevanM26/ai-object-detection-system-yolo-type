@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DetectionCanvas } from '@/components/DetectionCanvas';
@@ -7,12 +7,13 @@ import { SafetyLog } from '@/components/SafetyLog';
 import { InferenceMetrics } from '@/components/InferenceMetrics';
 import { loadModel, runInference, isModelLoaded, Detection } from '@/lib/onnxInference';
 import { useToast } from '@/hooks/use-toast';
-import { Shield, LogOut, Camera, Upload, Activity, Cpu, Play, Square, RefreshCw } from 'lucide-react';
+import { Shield, Home, Camera, Upload, Activity, Cpu, Play, Square, RefreshCw } from 'lucide-react';
 
 export default function Dashboard() {
-  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [modelLoaded, setModelLoaded] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [isRunning, setIsRunning] = useState(false);
   const [detections, setDetections] = useState<Detection[]>([]);
   const [allDetections, setAllDetections] = useState<Detection[]>([]);
@@ -28,7 +29,10 @@ export default function Dashboard() {
   useEffect(() => {
     loadModel('/best.onnx').then(success => {
       setModelLoaded(success);
-      if (!success) {
+      setIsLoading(false);
+      if (success) {
+        toast({ title: 'Model Ready', description: 'YOLOv8 Nano loaded (1280px)' });
+      } else {
         toast({ title: 'Model Loading', description: 'Place best.onnx in /public folder', variant: 'destructive' });
       }
     });
@@ -43,6 +47,7 @@ export default function Dashboard() {
         await videoRef.current.play();
         setImageSource(videoRef.current);
         setCanvasSize({ width: videoRef.current.videoWidth, height: videoRef.current.videoHeight });
+        toast({ title: 'Webcam Active', description: 'Camera stream initialized' });
       }
     } catch (err) {
       toast({ title: 'Camera Error', description: 'Could not access webcam', variant: 'destructive' });
@@ -53,7 +58,11 @@ export default function Dashboard() {
     const file = e.target.files?.[0];
     if (file) {
       const img = new Image();
-      img.onload = () => { setImageSource(img); setCanvasSize({ width: img.width, height: img.height }); };
+      img.onload = () => { 
+        setImageSource(img); 
+        setCanvasSize({ width: img.width, height: img.height }); 
+        toast({ title: 'Image Loaded', description: file.name });
+      };
       img.src = URL.createObjectURL(file);
     }
   };
@@ -75,9 +84,29 @@ export default function Dashboard() {
   useEffect(() => { if (isRunning && imageSource) runDetectionLoop(); }, [isRunning, imageSource, runDetectionLoop]);
 
   const toggleDetection = () => {
-    if (isRunning) { setIsRunning(false); if (animationRef.current) cancelAnimationFrame(animationRef.current); }
-    else { setIsRunning(true); lastTimeRef.current = 0; }
+    if (isRunning) { 
+      setIsRunning(false); 
+      if (animationRef.current) cancelAnimationFrame(animationRef.current); 
+    } else { 
+      setIsRunning(true); 
+      lastTimeRef.current = 0; 
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center grid-bg">
+        <div className="text-center space-y-4">
+          <div className="relative">
+            <div className="h-16 w-16 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto" />
+          </div>
+          <p className="font-mono text-sm text-muted-foreground animate-pulse">
+            LOADING AI MODEL...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen grid-bg">
@@ -88,8 +117,11 @@ export default function Dashboard() {
             <h1 className="font-display text-xl font-bold tracking-wider hidden sm:block">STATION SAFETY</h1>
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-xs text-muted-foreground font-mono hidden sm:block">{user?.email}</span>
-            <Button variant="ghost" size="sm" onClick={signOut}><LogOut className="h-4 w-4" /></Button>
+            <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono ${modelLoaded ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+              <div className={`w-2 h-2 rounded-full ${modelLoaded ? 'bg-green-400' : 'bg-red-400'} animate-pulse`} />
+              {modelLoaded ? 'MODEL READY' : 'MODEL ERROR'}
+            </div>
+            <Button variant="ghost" size="sm" onClick={() => navigate('/')}><Home className="h-4 w-4" /></Button>
           </div>
         </div>
       </header>
@@ -103,11 +135,11 @@ export default function Dashboard() {
 
           <TabsContent value="detection" className="space-y-6">
             <div className="flex flex-wrap gap-3">
-              <Button onClick={startWebcam} variant="outline"><Camera className="h-4 w-4 mr-2" />Webcam</Button>
-              <Button onClick={() => fileInputRef.current?.click()} variant="outline"><Upload className="h-4 w-4 mr-2" />Upload</Button>
+              <Button onClick={startWebcam} variant="outline" className="border-primary/50 hover:bg-primary/10"><Camera className="h-4 w-4 mr-2" />Webcam</Button>
+              <Button onClick={() => fileInputRef.current?.click()} variant="outline" className="border-primary/50 hover:bg-primary/10"><Upload className="h-4 w-4 mr-2" />Upload</Button>
               <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
               <Button onClick={toggleDetection} disabled={!imageSource || !modelLoaded} variant={isRunning ? 'destructive' : 'default'}>
-                {isRunning ? <><Square className="h-4 w-4 mr-2" />Stop</> : <><Play className="h-4 w-4 mr-2" />Start</>}
+                {isRunning ? <><Square className="h-4 w-4 mr-2" />Stop</> : <><Play className="h-4 w-4 mr-2" />Start Detection</>}
               </Button>
               <Button onClick={() => setAllDetections([])} variant="secondary"><RefreshCw className="h-4 w-4 mr-2" />Clear Log</Button>
             </div>
@@ -119,8 +151,11 @@ export default function Dashboard() {
                   {imageSource ? (
                     <DetectionCanvas imageSource={imageSource} detections={detections} width={Math.min(canvasSize.width, 800)} height={Math.min(canvasSize.height, 600)} />
                   ) : (
-                    <div className="aspect-video flex items-center justify-center bg-secondary/50 rounded-lg">
-                      <p className="text-muted-foreground font-mono">Select input source</p>
+                    <div className="aspect-video flex items-center justify-center bg-secondary/50 rounded-lg border border-dashed border-primary/30">
+                      <div className="text-center space-y-2">
+                        <Camera className="h-12 w-12 mx-auto text-muted-foreground" />
+                        <p className="text-muted-foreground font-mono">Select webcam or upload image</p>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -137,7 +172,7 @@ export default function Dashboard() {
               <div className="grid sm:grid-cols-3 gap-4 text-center">
                 <div className="stat-card"><p className="text-3xl font-display font-bold text-primary">1,000+</p><p className="text-xs text-muted-foreground">Synthetic Images</p></div>
                 <div className="stat-card"><p className="text-3xl font-display font-bold text-accent">7</p><p className="text-xs text-muted-foreground">Safety Classes</p></div>
-                <div className="stat-card"><p className="text-3xl font-display font-bold text-success">1280px</p><p className="text-xs text-muted-foreground">Resolution</p></div>
+                <div className="stat-card"><p className="text-3xl font-display font-bold" style={{ color: 'hsl(145 80% 45%)' }}>1280px</p><p className="text-xs text-muted-foreground">Resolution</p></div>
               </div>
             </div>
           </TabsContent>

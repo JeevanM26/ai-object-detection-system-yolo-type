@@ -1,23 +1,16 @@
-import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Shield, Rocket, Zap, Activity } from 'lucide-react';
 
 export default function Index() {
-  const { user, loading } = useAuth();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!loading && user) navigate('/dashboard');
-  }, [user, loading, navigate]);
 
   return (
     <div className="min-h-screen grid-bg relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-accent/5" />
       
       <div className="container relative z-10 flex flex-col items-center justify-center min-h-screen py-12 text-center">
-        <div className="space-y-8 animate-fade-in">
+        <div className="space-y-8">
           <div className="flex justify-center">
             <div className="relative">
               <Shield className="h-24 w-24 text-primary neon-text" />
@@ -33,13 +26,13 @@ export default function Index() {
           </p>
 
           <div className="flex flex-wrap gap-4 justify-center pt-4">
-            <Button size="xl" onClick={() => navigate('/auth')} className="font-display">
-              <Rocket className="h-5 w-5 mr-2" />
+            <Button size="lg" onClick={() => navigate('/dashboard')} className="font-display gap-2">
+              <Rocket className="h-5 w-5" />
               LAUNCH MISSION
             </Button>
-            <Button size="xl" variant="neon" onClick={() => navigate('/auth')}>
-              <Zap className="h-5 w-5 mr-2" />
-              ACCESS SYSTEM
+            <Button size="lg" variant="outline" onClick={() => navigate('/system-health')} className="font-display gap-2 border-primary/50 hover:bg-primary/10">
+              <Zap className="h-5 w-5" />
+              SYSTEM HEALTH
             </Button>
           </div>
 
@@ -53,7 +46,7 @@ export default function Index() {
               <p className="text-xs text-muted-foreground">Classes</p>
             </div>
             <div className="stat-card text-center">
-              <p className="text-2xl font-display font-bold text-success">YOLOv8</p>
+              <p className="text-2xl font-display font-bold" style={{ color: 'hsl(145 80% 45%)' }}>YOLOv8</p>
               <p className="text-xs text-muted-foreground">Model</p>
             </div>
           </div>
