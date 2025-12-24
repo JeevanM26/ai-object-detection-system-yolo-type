@@ -1,3 +1,10 @@
+⚠️ IMPORTANT: READ THIS BEFORE EVALUATION ⚠️
+"i have trained this model with "i5 8gen cpu"
+with "320p" with only "10 epochs" and i got maxim of 0.8 mAP50
+it worked great but my idea is to integrate the model with duality falcun ai so 
+when a new item is added my model will ask the falcon ai to generate the images and train itself and 
+where it has less mop50 it will train again in that certain part and improve it self continuesly "
+
 # 🛰️ Orbital Watch: AI Safety Auditor
 
 ### 🚀 Overview
