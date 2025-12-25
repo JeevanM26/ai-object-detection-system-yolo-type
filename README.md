@@ -22,6 +22,6 @@ Our model is specialized for 7 critical facility items:
 `OxygenTank`, `NitrogenTank`, `FirstAidBox`, `FireAlarm`, `SafetySwitchPanel`, `EmergencyPhone`, `FireExtinguisher`.
 
 ### 💻 How to Run Locally
-1. Clone the repo: `git clone https://github.com/JeevanM26/orbital-watch.git`
+1. Clone the repo: `git clone https://https://github.com/JeevanM26/ai-object-detection-system-yolo-type
 2. Install dependencies: `npm install`
 3. Start the dev server: `npm run dev`
