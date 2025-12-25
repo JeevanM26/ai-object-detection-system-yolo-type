@@ -7,7 +7,7 @@ when a new item is added my model will ask the falcon ai to generate the images 
 where it has less mop50 it will train again in that certain part and improve it self continuesly "
 
 # 🛰️ Orbital Watch: AI Safety Auditor
-
+# it is YOLO (you can look once) type model trained
 ### 🚀 Overview
 Orbital Watch is an automated facility safety monitor. Using **YOLOv8** for object detection and **Falcon 2 VLM** for contextual reasoning, it identifies safety equipment and generates real-time compliance audits.
 
