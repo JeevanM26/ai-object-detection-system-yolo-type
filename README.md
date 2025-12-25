@@ -1,4 +1,4 @@
-⚠️ IMPORTANT: READ THIS BEFORE EVALUATION ⚠️
+# ⚠️ IMPORTANT: READ THIS BEFORE EVALUATION ⚠️
 
 " TO GET REAL WORLD EXPERIANCE, i have trained this model with "i5 8gen cpu" (**NO GPU USED**)
 with "320p"(now if we provide high quality images it detaects ) with only "10 epochs" and i got maxim of 0.8 mAP50
